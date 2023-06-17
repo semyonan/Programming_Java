@@ -1,0 +1,59 @@
+<!DOCTYPE mapper     PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis.mappers.CarModelMapper">
+
+    <resultMap id="carModelResultMap" type="entities.CarModel">
+        <id property="id" column="id" />
+        <result property="name" column="name"/>
+        <result property="length" column="length"/>
+        <result property="width" column="width"/>
+        <result property="bodyType" column="body_type"/>
+        <association property="carMark" column="car_mark_id" javaType="entities.CarMark">
+            <id property="id" column="car_mark_id"/>
+            <result property="name" column="car_mark_name" />
+            <result property="releaseDate" column="car_mark_release_date" />
+        </association>
+    </resultMap>
+
+    <select id="getById" parameterType="long" resultMap="carModelResultMap">
+        SELECT MODEL.ID, MODEL.NAME,  MODEL.LENGTH, MODEL.WIDTH, MODEL.BODY_TYPE,
+               MARK.ID as "car_mark_id", MARK.NAME as "car_mark_name", MARK.RELEASE_DATE as "car_mark_release_date"
+        FROM CAR_MODEL MODEL inner JOIN CAR_MARK MARK ON MODEL.CAR_MARK_ID=MARK.ID
+        WHERE MODEL.ID = #{id}
+    </select>
+
+    <select id="getAll" resultMap="carModelResultMap">
+        SELECT MODEL.ID, MODEL.NAME,  MODEL.LENGTH, MODEL.WIDTH, MODEL.BODY_TYPE,
+               MARK.ID as "car_mark_id", MARK.NAME as "car_mark_name", MARK.RELEASE_DATE as "car_mark_release_date"
+        FROM CAR_MODEL MODEL INNER JOIN CAR_MARK MARK ON MODEL.CAR_MARK_ID=MARK.ID
+    </select>
+
+    <select id="getAllByCarMarkId" parameterType="long" resultMap="carModelResultMap">
+        SELECT MODEL.ID, MODEL.NAME,  MODEL.LENGTH, MODEL.WIDTH, MODEL.BODY_TYPE,
+               MARK.ID as "car_mark_id", MARK.NAME as "car_mark_name", MARK.RELEASE_DATE as "car_mark_release_date"
+        FROM CAR_MODEL MODEL INNER JOIN CAR_MARK MARK ON MODEL.CAR_MARK_ID=MARK.ID
+        WHERE MARK.ID = #{id}
+    </select>
+
+    <insert id="insert" parameterType="entities.CarModel" useGeneratedKeys="true" keyProperty="id">
+        insert into CAR_MODEL (name, length, width, body_type, car_mark_id)
+        values (#{entity.name}, #{entity.length}, #{entity.width}, #{entity.bodyType}, #{entity.carMark.id})
+    </insert>
+
+    <update id="update" parameterType="entities.CarModel">
+        update CAR_MODEL set
+                             car_mark_id = #{entity.carMark.id},
+                             name = #{entity.name},
+                             length = #{entity.length},
+                             width = #{entity.width},
+                             body_type = #{entity.bodyType}
+        where id = #{entity.id}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        delete from CAR_MODEL where id = #{id}
+    </delete>
+
+    <delete id="deleteAll" >
+        delete from CAR_MODEL
+    </delete>
+</mapper>
